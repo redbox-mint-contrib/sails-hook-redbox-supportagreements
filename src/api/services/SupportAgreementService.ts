@@ -1,6 +1,8 @@
 import { Services as services, type BrandingModel } from '@researchdatabox/redbox-core';
 import type { ReleaseNote, SupportAgreementAttributes, SupportAgreementYear } from '../models/SupportAgreement';
 
+const MarkdownIt = require('markdown-it');
+
 type BrandIdentifier = BrandingModel | string;
 
 type SupportAgreementRecord = SupportAgreementAttributes & {
@@ -18,6 +20,17 @@ type ViewReleaseNote = ReleaseNote & {
   renderedBody: string;
 };
 
+type MarkdownRenderer = {
+  render: (source: string) => string;
+};
+
+const markdownRenderer: MarkdownRenderer = new MarkdownIt({
+  breaks: false,
+  html: false,
+  linkify: true,
+  typographer: false
+});
+
 export type SupportAgreementViewModel = {
   agreedSupportDays: number;
   usedSupportDays: number;
@@ -27,8 +40,16 @@ export type SupportAgreementViewModel = {
   releaseNotes: ViewReleaseNote[];
 };
 
+export type SupportAgreementManagementViewModel = Omit<SupportAgreementViewModel, 'releaseNotes'> & {
+  releaseNotes: ViewReleaseNote[];
+};
+
 declare const BrandingService: {
   getBrand: (branding: string) => BrandingModel;
+};
+
+declare const DomSanitizerService: {
+  sanitizeWithProfile: (content: string, profileName?: string) => string;
 };
 
 type SupportAgreementModelApi = {
@@ -100,7 +121,13 @@ function escapeHtml(value: string): string {
 }
 
 function renderReleaseNoteBody(body: string): string {
-  return escapeHtml(body).replace(/\r?\n/g, '<br>');
+  const rendered = markdownRenderer.render(body);
+
+  if (typeof DomSanitizerService !== 'undefined' && typeof DomSanitizerService.sanitizeWithProfile === 'function') {
+    return DomSanitizerService.sanitizeWithProfile(rendered, 'html');
+  }
+
+  return rendered;
 }
 
 function createTimestamp(): string {
@@ -146,7 +173,8 @@ export namespace Services {
       'createReleaseNote',
       'updateReleaseNote',
       'deleteReleaseNote',
-      'getViewModel'
+      'getViewModel',
+      'getManagementViewModel'
     ];
 
     protected resolveBrand(brand: BrandIdentifier): BrandingModel {
@@ -403,6 +431,15 @@ export namespace Services {
       } catch (error) {
         throw toError(error);
       }
+    }
+
+    public async getManagementViewModel(brand: BrandIdentifier, selectedYear?: unknown): Promise<SupportAgreementManagementViewModel> {
+      const viewModel = await this.getViewModel(brand, selectedYear);
+      return {
+        ...viewModel,
+        releaseNotes: (await this.listReleaseNotes(brand))
+          .map(note => ({ ...note, renderedBody: renderReleaseNoteBody(note.body) }))
+      };
     }
   }
 }

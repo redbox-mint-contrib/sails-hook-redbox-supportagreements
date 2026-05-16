@@ -1,7 +1,32 @@
 export const routes = {
-  '/:branding/:portal/admin/supportAgreement': {
+  'get /:branding/:portal/admin/supportAgreement': {
     controller: 'SupportAgreementController',
     action: 'index',
+    skipAssets: true
+  },
+  'post /:branding/:portal/admin/supportAgreement/year': {
+    controller: 'SupportAgreementController',
+    action: 'saveYear',
+    skipAssets: true
+  },
+  'post /:branding/:portal/admin/supportAgreement/year/delete': {
+    controller: 'SupportAgreementController',
+    action: 'deleteYear',
+    skipAssets: true
+  },
+  'post /:branding/:portal/admin/supportAgreement/release-note': {
+    controller: 'SupportAgreementController',
+    action: 'createReleaseNote',
+    skipAssets: true
+  },
+  'post /:branding/:portal/admin/supportAgreement/release-note/update': {
+    controller: 'SupportAgreementController',
+    action: 'updateReleaseNote',
+    skipAssets: true
+  },
+  'post /:branding/:portal/admin/supportAgreement/release-note/delete': {
+    controller: 'SupportAgreementController',
+    action: 'deleteReleaseNote',
     skipAssets: true
   },
   'get /:branding/:portal/api/support-agreements': {

@@ -36,6 +36,7 @@ function installSupportAgreementTestGlobals(overrides: Record<string, unknown> =
 
   (global as Record<string, unknown>).supportagreementservice = {
     getViewModel: sinon.stub(),
+    getManagementViewModel: sinon.stub(),
     getForBrand: sinon.stub(),
     setYear: sinon.stub(),
     deleteYear: sinon.stub(),

@@ -120,6 +120,25 @@ describe('SupportAgreementService', () => {
     expect(result.selectedYear).to.equal(2020);
   });
 
+  it('getManagementViewModel includes unpublished notes with rendered bodies', async () => {
+    findOneStub.resolves({
+      id: 'sa-1',
+      branding: 'brand-default',
+      supportYears: {},
+      releaseNotes: [
+        { id: 'rn-1', title: 'Published', body: 'Published body', published: true, createdAt: '2026-05-16T01:30:00.000Z', updatedAt: '2026-05-16T01:30:00.000Z' },
+        { id: 'rn-2', title: 'Draft', body: '# Draft\n\n- Great *huh*', published: false, createdAt: '2026-05-17T01:30:00.000Z', updatedAt: '2026-05-17T01:30:00.000Z' }
+      ]
+    });
+
+    const result = await service.getManagementViewModel('default', 2026);
+
+    expect(result.releaseNotes.map((note: { id: string }) => note.id)).to.deep.equal(['rn-2', 'rn-1']);
+    expect(result.releaseNotes[0].body).to.equal('# Draft\n\n- Great *huh*');
+    expect(result.releaseNotes[0].renderedBody).to.contain('<h1>Draft</h1>');
+    expect(result.releaseNotes[0].renderedBody).to.contain('<li>Great <em>huh</em></li>');
+  });
+
   it('createReleaseNote assigns id, createdAt, and updatedAt', async () => {
     findOneStub.resolves({ id: 'sa-1', branding: 'brand-default', supportYears: {}, releaseNotes: [] });
 

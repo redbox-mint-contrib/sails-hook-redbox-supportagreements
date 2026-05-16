@@ -11,6 +11,7 @@ type RedboxHookOptionsWithModels = Parameters<typeof defineRedboxHook>[0] & {
 
 type RedboxHookWithModels = ReturnType<typeof defineRedboxHook> & {
   registerRedboxModels?: () => HookRegistrationMap;
+  defaults?: typeof hookOptions.defaults;
 };
 
 const hookOptions = {
@@ -30,7 +31,10 @@ const hookOptions = {
   routes: {},
   defaults: {
     __configKey__: {
-      _hookTimeout: 120000
+      _hookTimeout: 120000,
+      supportAgreement: {
+        managementAllowedUsernames: ['admin']
+      }
     }
   },
   registerRedboxConfig(): HookRegistrationMap {
@@ -60,6 +64,7 @@ const hookOptions = {
 } as unknown as RedboxHookOptionsWithModels;
 
 const hook = defineRedboxHook(hookOptions) as RedboxHookWithModels;
+hook.defaults = hookOptions.defaults;
 
 hook.registerRedboxModels = function registerRedboxModels(): HookRegistrationMap {
   return require('./api/models').ModelExports as HookRegistrationMap;

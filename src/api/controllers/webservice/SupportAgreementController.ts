@@ -1,4 +1,5 @@
 import { Controllers as controllers } from '@researchdatabox/redbox-core';
+import { canManageSupportAgreements } from '../supportAgreementAccess';
 
 declare const BrandingService: {
   getBrandFromReq: (req: Sails.Req) => unknown;
@@ -39,6 +40,14 @@ export namespace Controllers {
       return BrandingService.getBrandFromReq(req);
     }
 
+    protected sendForbidden(req: Sails.Req, res: Sails.Res): unknown {
+      return this.sendResp(req, res, {
+        status: 403,
+        displayErrors: [{ detail: 'Forbidden' }],
+        headers: this.getNoCacheHeaders()
+      });
+    }
+
     public async getSettings(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
@@ -69,6 +78,10 @@ export namespace Controllers {
     }
 
     public async setYear(req: Sails.Req, res: Sails.Res): Promise<unknown> {
+      if (!canManageSupportAgreements(req)) {
+        return this.sendForbidden(req, res);
+      }
+
       try {
         const brand = this.getBrand(req);
         const saved = await supportagreementservice.setYear(brand, req.param('year'), req.body as Record<string, unknown>);
@@ -83,6 +96,10 @@ export namespace Controllers {
     }
 
     public async deleteYear(req: Sails.Req, res: Sails.Res): Promise<unknown> {
+      if (!canManageSupportAgreements(req)) {
+        return this.sendForbidden(req, res);
+      }
+
       try {
         const brand = this.getBrand(req);
         await supportagreementservice.deleteYear(brand, req.param('year'));
@@ -105,6 +122,10 @@ export namespace Controllers {
     }
 
     public async createReleaseNote(req: Sails.Req, res: Sails.Res): Promise<unknown> {
+      if (!canManageSupportAgreements(req)) {
+        return this.sendForbidden(req, res);
+      }
+
       try {
         const brand = this.getBrand(req);
         const created = await supportagreementservice.createReleaseNote(brand, req.body as Record<string, unknown>);
@@ -119,6 +140,10 @@ export namespace Controllers {
     }
 
     public async updateReleaseNote(req: Sails.Req, res: Sails.Res): Promise<unknown> {
+      if (!canManageSupportAgreements(req)) {
+        return this.sendForbidden(req, res);
+      }
+
       try {
         const brand = this.getBrand(req);
         const updated = await supportagreementservice.updateReleaseNote(brand, String(req.param('id') ?? ''), req.body as Record<string, unknown>);
@@ -134,6 +159,10 @@ export namespace Controllers {
     }
 
     public async deleteReleaseNote(req: Sails.Req, res: Sails.Res): Promise<unknown> {
+      if (!canManageSupportAgreements(req)) {
+        return this.sendForbidden(req, res);
+      }
+
       try {
         const brand = this.getBrand(req);
         await supportagreementservice.deleteReleaseNote(brand, String(req.param('id') ?? ''));

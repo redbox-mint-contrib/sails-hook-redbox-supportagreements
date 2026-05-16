@@ -33,6 +33,38 @@
                 </span>
             </div>
             <div class="panel-body">
+                <% if (canManageSupportAgreements) { %>
+                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/year" class="form-horizontal" style="margin-bottom: 20px;">
+                        <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
+                        <input type="hidden" name="year" value="<%= selectedYear %>">
+                        <div class="form-group">
+                            <label for="agreedSupportDays" class="col-sm-3 control-label">
+                                <%= TranslationService.t('agreed-support-days') %>
+                            </label>
+                            <div class="col-sm-3">
+                                <input id="agreedSupportDays" name="agreedSupportDays" type="number" min="0" step="0.01" class="form-control" value="<%= agreedSupportDays %>">
+                            </div>
+                            <label for="usedSupportDays" class="col-sm-3 control-label">
+                                <%= TranslationService.t('used-support-days') %>
+                            </label>
+                            <div class="col-sm-3">
+                                <input id="usedSupportDays" name="usedSupportDays" type="number" min="0" step="0.01" class="form-control" value="<%= usedSupportDays %>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12 text-right">
+                                <button type="submit" class="btn btn-primary">Save support year</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/year/delete" class="text-right" style="margin-bottom: 20px;">
+                        <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
+                        <input type="hidden" name="year" value="<%= selectedYear %>">
+                        <button type="submit" class="btn btn-danger">Delete support year</button>
+                    </form>
+                <% } %>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="well">
@@ -99,6 +131,41 @@
                 </span>
             </div>
             <div class="panel-body">
+                <% if (canManageSupportAgreements) { %>
+                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note" class="form-horizontal" style="margin-bottom: 30px;">
+                        <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
+                        <input type="hidden" name="year" value="<%= selectedYear %>">
+                        <div class="form-group">
+                            <label for="newReleaseNoteTitle" class="col-sm-2 control-label">Title</label>
+                            <div class="col-sm-10">
+                                <input id="newReleaseNoteTitle" name="title" type="text" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newReleaseNoteDate" class="col-sm-2 control-label">Release date</label>
+                            <div class="col-sm-4">
+                                <input id="newReleaseNoteDate" name="releaseDate" type="date" class="form-control">
+                            </div>
+                            <div class="col-sm-6 checkbox" style="padding-top: 0;">
+                                <label>
+                                    <input name="published" type="checkbox" value="true"> Published
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newReleaseNoteBody" class="col-sm-2 control-label">Body</label>
+                            <div class="col-sm-10">
+                                <textarea id="newReleaseNoteBody" name="body" rows="4" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12 text-right">
+                                <button type="submit" class="btn btn-primary">Create release note</button>
+                            </div>
+                        </div>
+                    </form>
+                <% } %>
+
                 <% if (!releaseNotes || releaseNotes.length === 0) { %>
                     <p class="text-muted">
                         <%= (typeof TranslationService !== 'undefined' && TranslationService.t) ? TranslationService.t('no-release-notes-configured') : 'No release notes configured.' %>
@@ -106,11 +173,53 @@
                 <% } else { %>
                     <% releaseNotes.forEach(function(note) { %>
                         <div class="well">
-                            <h4><%= note.title %></h4>
-                            <% if (note.releaseDate) { %>
-                                <p class="text-muted"><%= note.releaseDate %></p>
+                            <% if (canManageSupportAgreements) { %>
+                                <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note/update" class="form-horizontal">
+                                    <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
+                                    <input type="hidden" name="year" value="<%= selectedYear %>">
+                                    <input type="hidden" name="id" value="<%= note.id %>">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Title</label>
+                                        <div class="col-sm-10">
+                                            <input name="title" type="text" class="form-control" value="<%= note.title %>" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Release date</label>
+                                        <div class="col-sm-4">
+                                            <input name="releaseDate" type="date" class="form-control" value="<%= note.releaseDate || '' %>">
+                                        </div>
+                                        <div class="col-sm-6 checkbox" style="padding-top: 0;">
+                                            <label>
+                                                <input name="published" type="checkbox" value="true" <%= note.published ? 'checked' : '' %>> Published
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Body</label>
+                                        <div class="col-sm-10">
+                                            <textarea name="body" rows="4" class="form-control"><%= note.body %></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12 text-right">
+                                            <button type="submit" class="btn btn-default">Update release note</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note/delete" class="text-right" style="margin-top: 10px;">
+                                    <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
+                                    <input type="hidden" name="year" value="<%= selectedYear %>">
+                                    <input type="hidden" name="id" value="<%= note.id %>">
+                                    <button type="submit" class="btn btn-danger">Delete release note</button>
+                                </form>
+                            <% } else { %>
+                                <h4><%= note.title %></h4>
+                                <% if (note.releaseDate) { %>
+                                    <p class="text-muted"><%= note.releaseDate %></p>
+                                <% } %>
+                                <p><%- note.renderedBody %></p>
                             <% } %>
-                            <p><%- note.renderedBody %></p>
                         </div>
                     <% }); %>
                 <% } %>
