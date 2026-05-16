@@ -5,7 +5,7 @@ declare const BrandingService: {
   getBrandFromReq?: (req: Sails.Req) => BrandLike;
 };
 
-declare const Supportagreementservice: {
+declare const supportagreementservice: {
   getViewModel: (brand: BrandLike, selectedYear: number | undefined) => Promise<{
     agreedSupportDays: number;
     usedSupportDays: number;
@@ -32,7 +32,7 @@ export namespace Controllers {
       const brand = typeof BrandingService.getBrandFromReq === 'function'
         ? BrandingService.getBrandFromReq(req)
         : BrandingService.getBrand(req.session.branding as string);
-      const viewModel = await Supportagreementservice.getViewModel(brand, resolvedSelectedYear);
+      const viewModel = await supportagreementservice.getViewModel(brand, resolvedSelectedYear);
 
       this.sendView(req, res, 'admin/supportAgreement', {
         agreedSupportDays: viewModel.agreedSupportDays,

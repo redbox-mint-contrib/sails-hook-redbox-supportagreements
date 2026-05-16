@@ -117,7 +117,20 @@ function createId(): string {
 }
 
 function getSupportAgreementModel(): SupportAgreementModelApi {
-  return (globalThis as unknown as { SupportAgreement: SupportAgreementModelApi }).SupportAgreement;
+  const globals = globalThis as unknown as {
+    SupportAgreement?: SupportAgreementModelApi;
+    supportagreement?: SupportAgreementModelApi;
+    sails?: {
+      models?: Record<string, SupportAgreementModelApi | undefined>;
+    };
+  };
+
+  const model = globals.sails?.models?.supportagreement ?? globals.supportagreement ?? globals.SupportAgreement;
+  if (!model) {
+    throw new Error('SupportAgreement model is not registered');
+  }
+
+  return model;
 }
 
 export namespace Services {

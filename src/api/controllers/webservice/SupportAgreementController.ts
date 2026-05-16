@@ -4,7 +4,7 @@ declare const BrandingService: {
   getBrandFromReq: (req: Sails.Req) => unknown;
 };
 
-declare const Supportagreementservice: {
+declare const supportagreementservice: {
   getForBrand: (brand: unknown) => Promise<{ supportYears?: Record<string, unknown>; releaseNotes?: unknown[] } | undefined>;
   setYear: (brand: unknown, year: unknown, data: Record<string, unknown>) => Promise<unknown>;
   deleteYear: (brand: unknown, year: unknown) => Promise<boolean>;
@@ -42,7 +42,7 @@ export namespace Controllers {
     public async getSettings(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        const settings = await Supportagreementservice.getForBrand(brand);
+        const settings = await supportagreementservice.getForBrand(brand);
         return this.sendResp(req, res, {
           data: {
             supportYears: settings?.supportYears ?? {},
@@ -58,7 +58,7 @@ export namespace Controllers {
     public async listYears(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        const settings = await Supportagreementservice.getForBrand(brand);
+        const settings = await supportagreementservice.getForBrand(brand);
         return this.sendResp(req, res, {
           data: settings?.supportYears ?? {},
           headers: this.getNoCacheHeaders()
@@ -71,7 +71,7 @@ export namespace Controllers {
     public async setYear(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        const saved = await Supportagreementservice.setYear(brand, req.param('year'), req.body as Record<string, unknown>);
+        const saved = await supportagreementservice.setYear(brand, req.param('year'), req.body as Record<string, unknown>);
         return this.sendResp(req, res, { data: saved, headers: this.getNoCacheHeaders() });
       } catch (error) {
         return this.sendResp(req, res, {
@@ -85,7 +85,7 @@ export namespace Controllers {
     public async deleteYear(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        await Supportagreementservice.deleteYear(brand, req.param('year'));
+        await supportagreementservice.deleteYear(brand, req.param('year'));
         return this.sendResp(req, res, { data: { status: true }, headers: this.getNoCacheHeaders() });
       } catch (error) {
         return this.sendResp(req, res, { status: 500, errors: [asError(error)], headers: this.getNoCacheHeaders() });
@@ -95,7 +95,7 @@ export namespace Controllers {
     public async listReleaseNotes(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        const notes = await Supportagreementservice.listReleaseNotes(brand, {
+        const notes = await supportagreementservice.listReleaseNotes(brand, {
           publishedOnly: req.param('publishedOnly') === 'true'
         });
         return this.sendResp(req, res, { data: notes, headers: this.getNoCacheHeaders() });
@@ -107,7 +107,7 @@ export namespace Controllers {
     public async createReleaseNote(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        const created = await Supportagreementservice.createReleaseNote(brand, req.body as Record<string, unknown>);
+        const created = await supportagreementservice.createReleaseNote(brand, req.body as Record<string, unknown>);
         return this.sendResp(req, res, { status: 201, data: created, headers: this.getNoCacheHeaders() });
       } catch (error) {
         return this.sendResp(req, res, {
@@ -121,7 +121,7 @@ export namespace Controllers {
     public async updateReleaseNote(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        const updated = await Supportagreementservice.updateReleaseNote(brand, String(req.param('id') ?? ''), req.body as Record<string, unknown>);
+        const updated = await supportagreementservice.updateReleaseNote(brand, String(req.param('id') ?? ''), req.body as Record<string, unknown>);
         return this.sendResp(req, res, { data: updated, headers: this.getNoCacheHeaders() });
       } catch (error) {
         const resolvedError = asError(error);
@@ -136,7 +136,7 @@ export namespace Controllers {
     public async deleteReleaseNote(req: Sails.Req, res: Sails.Res): Promise<unknown> {
       try {
         const brand = this.getBrand(req);
-        await Supportagreementservice.deleteReleaseNote(brand, String(req.param('id') ?? ''));
+        await supportagreementservice.deleteReleaseNote(brand, String(req.param('id') ?? ''));
         return this.sendResp(req, res, { data: { status: true }, headers: this.getNoCacheHeaders() });
       } catch (error) {
         const resolvedError = asError(error);

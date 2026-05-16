@@ -18,7 +18,7 @@ describe('SupportAgreementController', () => {
     controller = new Controllers.SupportAgreement();
     sendViewStub = sinon.stub(controller, 'sendView');
     getBrandFromReqStub = BrandingService.getBrandFromReq as SinonStub;
-    getViewModelStub = ((globalThis as unknown as Record<string, { getViewModel: SinonStub }>).Supportagreementservice).getViewModel;
+    getViewModelStub = ((globalThis as unknown as Record<string, { getViewModel: SinonStub }>).supportagreementservice).getViewModel;
   });
 
   afterEach(() => {

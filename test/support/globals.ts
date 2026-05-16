@@ -5,6 +5,12 @@ type LogFn = (...args: unknown[]) => void;
 
 function installSupportAgreementTestGlobals(overrides: Record<string, unknown> = {}): void {
   (global as Record<string, unknown>)._ = _;
+  (global as Record<string, unknown>).SupportAgreement = {
+    findOne: sinon.stub(),
+    create: sinon.stub(),
+    updateOne: sinon.stub()
+  };
+
   (global as Record<string, unknown>).sails = {
     log: {
       verbose: sinon.stub(),
@@ -14,6 +20,9 @@ function installSupportAgreementTestGlobals(overrides: Record<string, unknown> =
       error: sinon.stub()
     } satisfies Record<string, LogFn>,
     services: {},
+    models: {
+      supportagreement: (global as Record<string, unknown>).SupportAgreement
+    },
     config: {
       appPath: '/tmp',
       ...overrides
@@ -25,7 +34,7 @@ function installSupportAgreementTestGlobals(overrides: Record<string, unknown> =
     getBrandFromReq: sinon.stub()
   };
 
-  (global as Record<string, unknown>).Supportagreementservice = {
+  (global as Record<string, unknown>).supportagreementservice = {
     getViewModel: sinon.stub(),
     getForBrand: sinon.stub(),
     setYear: sinon.stub(),
@@ -35,19 +44,13 @@ function installSupportAgreementTestGlobals(overrides: Record<string, unknown> =
     updateReleaseNote: sinon.stub(),
     deleteReleaseNote: sinon.stub()
   };
-
-  (global as Record<string, unknown>).SupportAgreement = {
-    findOne: sinon.stub(),
-    create: sinon.stub(),
-    updateOne: sinon.stub()
-  };
 }
 
 function clearSupportAgreementTestGlobals(): void {
   delete (global as Record<string, unknown>)._;
   delete (global as Record<string, unknown>).sails;
   delete (global as Record<string, unknown>).BrandingService;
-  delete (global as Record<string, unknown>).Supportagreementservice;
+  delete (global as Record<string, unknown>).supportagreementservice;
   delete (global as Record<string, unknown>).SupportAgreement;
 }
 

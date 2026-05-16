@@ -52,6 +52,17 @@ describe('SupportAgreementService', () => {
     expect(result).to.include({ id: 'sa-1', branding: 'brand-default' });
   });
 
+  it('getForBrand resolves the registered lowercase Sails model', async () => {
+    const model = (globalThis as unknown as { SupportAgreement: Record<string, unknown> }).SupportAgreement;
+    (globalThis as unknown as { sails: { models: Record<string, unknown> } }).sails.models.supportagreement = model;
+    delete (globalThis as unknown as { SupportAgreement?: unknown }).SupportAgreement;
+    findOneStub.resolves({ id: 'sa-1', branding: 'brand-default', supportYears: {}, releaseNotes: [] });
+
+    const result = await service.getForBrand('default');
+
+    expect(result).to.include({ id: 'sa-1', branding: 'brand-default' });
+  });
+
   it('setYear validates year and saves support days', async () => {
     findOneStub.onFirstCall().resolves({ id: 'sa-1', branding: 'brand-default', supportYears: {}, releaseNotes: [] });
 

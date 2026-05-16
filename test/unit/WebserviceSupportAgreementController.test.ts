@@ -20,7 +20,7 @@ describe('Webservice SupportAgreementController', () => {
     sendRespStub = sinon.stub(controller, 'sendResp');
     getBrandFromReqStub = BrandingService.getBrandFromReq as SinonStub;
     getBrandFromReqStub.returns({ id: 'brand-1', name: 'default' });
-    supportAgreementService = (globalThis as unknown as Record<string, Record<string, SinonStub>>).Supportagreementservice;
+    supportAgreementService = (globalThis as unknown as Record<string, Record<string, SinonStub>>).supportagreementservice;
   });
 
   afterEach(() => {

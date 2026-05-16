@@ -61,4 +61,8 @@ const hookOptions = {
 
 const hook = defineRedboxHook(hookOptions) as RedboxHookWithModels;
 
+hook.registerRedboxModels = function registerRedboxModels(): HookRegistrationMap {
+  return require('./api/models').ModelExports as HookRegistrationMap;
+};
+
 module.exports = hook;
