@@ -14,7 +14,8 @@
     "hasServices": true,
     "hasControllers": true,
     "hasWebserviceControllers": true,
-    "hasConfig": true
+    "hasConfig": true,
+    "hasApiRoutes": true
   },
   "scripts": {
     "compile": "node ./node_modules/@researchdatabox/redbox-dev-tools/bin/run-hook-tsc.js -p tsconfig.json",
@@ -31,13 +32,18 @@
     "redbox"
   ],
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "markdown-it": "^14.3.0"
+  },
+  "bundleDependencies": [
+    "markdown-it"
+  ],
   "peerDependencies": {
-    "@researchdatabox/redbox-core": "0.0.1-beta.9022"
+    "@researchdatabox/redbox-core": "^0.0.1-beta.10213"
   },
   "devDependencies": {
-    "@researchdatabox/redbox-core": "0.0.1-beta.9022",
-    "@researchdatabox/redbox-dev-tools": "0.0.1-beta.9020",
+    "@researchdatabox/redbox-core": "^0.0.1-beta.10213",
+    "@researchdatabox/redbox-dev-tools": "^0.0.1-beta.10213",
     "@types/mocha": "10.0.10",
     "@types/node": "24.12.2",
     "@types/sinon": "21.0.0",

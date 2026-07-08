@@ -31,6 +31,21 @@ describe('Controller exports', () => {
     );
   });
 
+  it('registers API route contracts for webservice routes', () => {
+    expect(hook).to.have.property('registerHookApiRoutes').that.is.a('function');
+    const apiRoutes = hook.registerHookApiRoutes();
+    expect(apiRoutes.map((route: { method: string; path: string }) => `${route.method} ${route.path}`)).to.include.members([
+      'get /:branding/:portal/api/support-agreements',
+      'get /:branding/:portal/api/support-agreements/years',
+      'put /:branding/:portal/api/support-agreements/years/:year',
+      'delete /:branding/:portal/api/support-agreements/years/:year',
+      'get /:branding/:portal/api/support-agreements/release-notes',
+      'post /:branding/:portal/api/support-agreements/release-notes',
+      'patch /:branding/:portal/api/support-agreements/release-notes/:id',
+      'delete /:branding/:portal/api/support-agreements/release-notes/:id'
+    ]);
+  });
+
   it('exposes default management usernames in hook config', () => {
     expect(hook).to.have.nested.property('defaults.__configKey__.supportAgreement.managementAllowedUsernames');
     expect(hook.defaults.__configKey__.supportAgreement.managementAllowedUsernames).to.deep.equal(['admin']);

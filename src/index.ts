@@ -43,6 +43,9 @@ const hookOptions = {
       auth
     };
   },
+  registerHookApiRoutes() {
+    return require('./api-routes').supportAgreementApiRoutes;
+  },
   registerRedboxModels(): HookRegistrationMap {
     return require('./api/models').ModelExports as HookRegistrationMap;
   },
@@ -59,7 +62,8 @@ const hookOptions = {
     ControllerExports: require('./api/controllers').ControllerExports,
     WebserviceControllerExports: require('./api/controllers/webservice').WebserviceControllerExports,
     ServiceExports: require('./api/services').ServiceExports,
-    ModelExports: require('./api/models').ModelExports
+    ModelExports: require('./api/models').ModelExports,
+    supportAgreementApiRoutes: require('./api-routes').supportAgreementApiRoutes
   }
 } as unknown as RedboxHookOptionsWithModels;
 
