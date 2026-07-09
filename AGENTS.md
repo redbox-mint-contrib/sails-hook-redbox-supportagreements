@@ -29,7 +29,7 @@ Do not replace the custom `run-hook-tsc` or `run-hook-mocha` entrypoints with pl
 
 ## Hook Runtime
 
-This hook copies `views/` into the portal during `ConfigService.mergeHookConfig()`. Keep view paths compatible with core view lookup.
+This hook serves its packaged views directly from the hook directory. Do not copy `views/` into the portal root during hook initialization.
 
 ## Docker Runtime
 

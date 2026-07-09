@@ -15,19 +15,6 @@ type RedboxHookWithModels = ReturnType<typeof defineRedboxHook> & {
 };
 
 const hookOptions = {
-  initialize(sails: Sails.Application, cb: () => void) {
-    const configService = (sails.services as Record<string, unknown>)?.configservice as {
-      mergeHookConfig?: (hookName: string, configMap: Record<string, unknown>) => void;
-    } | undefined;
-
-    if (configService?.mergeHookConfig) {
-      configService.mergeHookConfig('@researchdatabox/sails-hook-redbox-supportagreements', sails.config);
-    } else {
-      sails.log.warn('sails-hook-redbox-supportagreements: ConfigService not available, skipping config merge');
-    }
-
-    cb();
-  },
   routes: {},
   defaults: {
     __configKey__: {
