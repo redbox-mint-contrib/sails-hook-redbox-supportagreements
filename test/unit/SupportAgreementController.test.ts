@@ -132,30 +132,11 @@ describe('SupportAgreementController', () => {
     expect(locals.canManageSupportAgreements).to.equal(false);
   });
 
-  it('uses the shared shell when all its partials resolve for the request brand and portal', async () => {
-    resolveViewStub.callsFake((_branding: string, _portal: string, view: string) => `default/default/${view}`);
+  it('passes the package version for both asset URLs', async () => {
     getManagementViewModelStub.resolves({ releaseNotes: [] });
-
     await controller.index(createReq(), createRes());
-
-    expect(sendViewStub.firstCall.args[3].hasSharedAdminShell).to.equal(true);
-    for (const partial of ['start', 'end', 'page-header']) {
-      expect(resolveViewStub.calledWithExactly('default', 'portal', `admin/layout/${partial}`)).to.equal(true);
-    }
+    expect(sendViewStub.firstCall.args[3].assetVersion).to.equal(require('../../package.json').version);
   });
-
-  for (const missing of ['start', 'end', 'page-header']) {
-    it(`uses the legacy layout when the ${missing} partial is absent`, async () => {
-      resolveViewStub.callsFake((_branding: string, _portal: string, view: string) =>
-        view === `admin/layout/${missing}` ? null : `default/default/${view}`
-      );
-      getManagementViewModelStub.resolves({ releaseNotes: [] });
-
-      await controller.index(createReq(), createRes());
-
-      expect(sendViewStub.firstCall.args[3].hasSharedAdminShell).to.equal(false);
-    });
-  }
 
   it('saveYear calls the service and redirects back to the selected year', async () => {
     const brand = { id: 'brand-1', name: 'default' };

@@ -1,5 +1,8 @@
-import { Controllers as controllers } from '@researchdatabox/redbox-core';
+import path from 'node:path';
+import { Controllers as controllers, resolveHookViewFile } from '@researchdatabox/redbox-core';
 import { canManageSupportAgreements } from './supportAgreementAccess';
+
+const assetVersion: string = require('../../../package.json').version;
 
 declare const BrandingService: {
   getBrand: (branding: string) => BrandLike;
@@ -74,14 +77,28 @@ export namespace Controllers {
 
       const branding = String(req.param('branding'));
       const portal = String(req.param('portal'));
-      // Use the same branding/hook/core lookup as sendView. Older cores only
-      // provide the sidebar, so never include shared-shell partials blindly.
-      const hasSharedAdminShell = ['start', 'end', 'page-header'].every(partial =>
-        this._getResolvedView(branding, portal, `admin/layout/${partial}`) !== null
-      );
+      // _getResolvedView selects the brand/portal candidate, but returns only a
+      // logical path. Resolve that candidate to the same hook/core file so EJS
+      // can include it even outside the selected page's portal mirror directory.
+      const resolvePartial = (name: string): string | null => {
+        const view = this._getResolvedView(branding, portal, `admin/layout/${name}`);
+        if (view === null) return null;
+        const appPath = sails.config.appPath;
+        return (resolveHookViewFile(appPath, view)
+          ?? resolveHookViewFile(appPath, view, { roots: [path.resolve(appPath, 'views')] }))?.absolutePath ?? null;
+      };
+      const adminLayoutPartials = {
+        start: resolvePartial('start'),
+        end: resolvePartial('end'),
+        pageHeader: resolvePartial('page-header'),
+        sidebar: resolvePartial('sidebar')
+      };
+      const hasSharedAdminShell = Boolean(adminLayoutPartials.start && adminLayoutPartials.end && adminLayoutPartials.pageHeader);
 
       this.sendView(req, res, 'admin/supportAgreement', {
         hasSharedAdminShell,
+        adminLayoutPartials,
+        assetVersion,
         branding: req.param('branding'),
         portal: req.param('portal'),
         agreedSupportDays: viewModel.agreedSupportDays,

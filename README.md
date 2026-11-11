@@ -37,13 +37,19 @@ npm run dev:run:clean
 The next CI beta fixes the admin page for nonce-based Content Security Policy.
 The plugin packages its stylesheet and year-selector script in `assets/`, which
 core serves directly from hooks. Remaining support days use a native `progress`
-element, so no inline styles or event handlers are needed.
+element, so no inline styles or event handlers are needed. Both asset URLs carry
+the package version to invalidate cached assets after an upgrade. The year selector
+uses `requestSubmit()` when available and falls back to `submit()`.
+
+Sails supplies the `_csrf` local when CSRF is enabled. The POST forms preserve
+that token; an empty field when CSRF is disabled is expected.
 
 Supported cores are npm `5.0.5` and the `5.1.0` beta series. The controller checks
 for the shared admin shell through core's branding/hook-aware view resolver.
 Cores with `start`, `end`, and `page-header` partials use the shared shell and
-breadcrumbs; core `5.0.5`, which only has the sidebar partial, keeps its existing
-admin layout. The CSP nonce is optional when CSP is disabled. The peer dependency
+breadcrumbs. Includes use the resolved filenames, so brand and hook shells keep
+their own nested includes. Core `5.0.5`, which only has the sidebar partial, keeps
+its existing admin layout. The CSP nonce is optional when CSP is disabled. The peer dependency
 is `^5.0.5 || ^5.1.0-0`; development uses exact core/dev-tools `5.0.5` pins to test
 the minimum supported release.
 

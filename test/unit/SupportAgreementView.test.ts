@@ -10,6 +10,7 @@ const root = path.resolve(__dirname, '../..');
 const filename = path.join(root, 'views/default/default/admin/supportAgreement.ejs');
 const template = fs.readFileSync(filename, 'utf8');
 const nonce = 'test-csp-nonce';
+const assetVersion = require('../../package.json').version;
 
 // The shell belongs to the portal, not this package. These small partials exercise
 // real EJS includes and their locals without installing/copying portal views.
@@ -29,6 +30,11 @@ function render(overrides: Record<string, unknown> = {}, sharedShell = true): st
     contentSecurityPolicyNonce: nonce,
     _csrf: 'test-csrf-token',
     hasSharedAdminShell: sharedShell,
+    assetVersion,
+    adminLayoutPartials: {
+      start: 'layout/start.ejs', end: 'layout/end.ejs',
+      pageHeader: 'layout/page-header.ejs', sidebar: 'layout/sidebar.ejs'
+    },
     agreedSupportDays: 10, usedSupportDays: 2.5,
     availableYears: [2026, 2025], selectedYear: 2026, currentYear: 2026,
     canManageSupportAgreements: false,
@@ -53,8 +59,8 @@ function assertCsp(html: string): void {
     expect(tag).to.include(`nonce="${nonce}"`);
   }
   expect(html).not.to.match(/<style\b/i);
-  expect(html).to.include('href="/redbox/styles/support-agreements/admin.css"');
-  expect(html).to.include('src="/redbox/js/support-agreements/admin.js"');
+  expect(html).to.include(`href="/redbox/styles/support-agreements/admin.css?v=${assetVersion}"`);
+  expect(html).to.include(`src="/redbox/js/support-agreements/admin.js?v=${assetVersion}"`);
 }
 
 const note = {
@@ -106,26 +112,31 @@ describe('Support agreement view', () => {
 
   it('renders on a legacy core with CSP disabled and no nonce local', () => {
     const html = render({ contentSecurityPolicyNonce: undefined }, false);
-    expect(html).to.include('<script src="/redbox/js/support-agreements/admin.js"></script>');
+    expect(html).to.include(`<script src="/redbox/js/support-agreements/admin.js?v=${assetVersion}"></script>`);
     expect(html).not.to.match(/\s(?:style|on\w+)\s*=/i);
   });
 
-  it('submits the year selector through a change listener', () => {
-    let handler: (() => void) | undefined;
-    let submitted = 0;
-    const selector = {
-      form: { requestSubmit: () => submitted++ },
-      addEventListener: (event: string, listener: () => void) => {
-        expect(event).to.equal('change');
-        handler = listener;
-      }
-    };
-    vm.runInNewContext(fs.readFileSync(path.join(root, 'assets/js/support-agreements/admin.js'), 'utf8'), {
-      document: { getElementById: (id: string) => { expect(id).to.equal('yearSelector'); return selector; } }
+  for (const supportsRequestSubmit of [true, false]) {
+    it(`submits the year selector with ${supportsRequestSubmit ? 'requestSubmit' : 'submit fallback'}`, () => {
+      let handler: (() => void) | undefined;
+      let submitted = 0;
+      const selector = {
+        form: {
+          requestSubmit: supportsRequestSubmit ? () => submitted++ : undefined,
+          submit: () => { expect(supportsRequestSubmit).to.equal(false); submitted++; }
+        },
+        addEventListener: (event: string, listener: () => void) => {
+          expect(event).to.equal('change');
+          handler = listener;
+        }
+      };
+      vm.runInNewContext(fs.readFileSync(path.join(root, 'assets/js/support-agreements/admin.js'), 'utf8'), {
+        document: { getElementById: (id: string) => { expect(id).to.equal('yearSelector'); return selector; } }
+      });
+      expect(submitted).to.equal(0);
+      expect(handler).to.be.a('function');
+      handler?.();
+      expect(submitted).to.equal(1);
     });
-    expect(submitted).to.equal(0);
-    expect(handler).to.be.a('function');
-    handler?.();
-    expect(submitted).to.equal(1);
-  });
+  }
 });
