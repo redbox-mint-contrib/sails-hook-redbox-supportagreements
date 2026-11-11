@@ -6,6 +6,7 @@
   "files": [
     "dist",
     "views",
+    "assets",
     "README.md"
   ],
   "sails": {
@@ -39,11 +40,11 @@
     "markdown-it"
   ],
   "peerDependencies": {
-    "@researchdatabox/redbox-core": "^0.0.1-beta.10213"
+    "@researchdatabox/redbox-core": "^5.0.5 || ^5.1.0-0"
   },
   "devDependencies": {
-    "@researchdatabox/redbox-core": "^0.0.1-beta.10213",
-    "@researchdatabox/redbox-dev-tools": "^0.0.1-beta.10213",
+    "@researchdatabox/redbox-core": "5.0.5",
+    "@researchdatabox/redbox-dev-tools": "5.0.5",
     "@types/mocha": "10.0.10",
     "@types/node": "24.12.2",
     "@types/sinon": "21.0.0",

@@ -32,6 +32,30 @@ npm run dev:run:clean
 - `src/api/controllers`: hook controllers
 - `views/`: copied EJS templates
 
+## Admin page compatibility and CSP
+
+The next CI beta fixes the admin page for nonce-based Content Security Policy.
+The plugin packages its stylesheet and year-selector script in `assets/`, which
+core serves directly from hooks. Remaining support days use a native `progress`
+element, so no inline styles or event handlers are needed.
+
+Supported cores are npm `5.0.5` and the `5.1.0` beta series. The controller checks
+for the shared admin shell through core's branding/hook-aware view resolver.
+Cores with `start`, `end`, and `page-header` partials use the shared shell and
+breadcrumbs; core `5.0.5`, which only has the sidebar partial, keeps its existing
+admin layout. The CSP nonce is optional when CSP is disabled. The peer dependency
+is `^5.0.5 || ^5.1.0-0`; development uses exact core/dev-tools `5.0.5` pins to test
+the minimum supported release.
+
+Institution view overrides still take precedence. Remove the support-agreement
+view override after verifying this plugin in that institution's portal. All 12
+client translation keys below are unchanged; the shared shell uses core's own
+existing navigation translations.
+
+CI sets the published version from the requested release base and pipeline
+number in `support/build/npm-publish-package.sh`. The source version stays
+`0.0.1-beta.0`; it is not manually bumped to `0.0.1-beta.8`.
+
 ## Client Hook Language Defaults
 
 Add these values to client hooks that install the support-agreements admin page.

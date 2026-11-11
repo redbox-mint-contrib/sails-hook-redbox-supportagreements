@@ -1,20 +1,31 @@
+<link rel="stylesheet" href="<%= BrandingService.getRootContext() %>/styles/support-agreements/admin.css">
+<% if (typeof hasSharedAdminShell !== 'undefined' && hasSharedAdminShell) { %>
+    <%- include('layout/start.ejs') %>
+    <div class="support-agreement">
+        <%- include('layout/page-header.ejs', {
+            titleKey: 'support-agreement-title',
+            breadcrumbs: [
+                { labelKey: 'menu-admin', href: BrandingService.getBrandAndPortalPath(req) + '/admin' },
+                { labelKey: 'support-agreement-title' }
+            ]
+        }) %>
+<% } else { %>
 <div class="row admin-layout">
     <div class="col-md-3 col-lg-2">
         <%- include('layout/sidebar.ejs') %>
     </div>
-    <div class="col-md-9 col-lg-10 admin-main-content">
-        <h2>
-            <%= TranslationService.t('support-agreement-title') %>
-        </h2>
+    <div class="col-md-9 col-lg-10 admin-main-content support-agreement">
+        <h2><%= TranslationService.t('support-agreement-title') %></h2>
+<% } %>
 
-        <div class="row" style="margin-bottom: 20px;">
+        <div class="row sa-space-20">
             <div class="col-md-12">
                 <form method="GET" id="yearSelectorForm">
                     <div class="form-group">
                         <label for="yearSelector" class="control-label">
                             <%= TranslationService.t('select-year') %>:
                         </label>
-                        <select id="yearSelector" name="year" class="form-control" style="display: inline-block; width: auto; margin-left: 10px;" onchange="this.form.submit()">
+                        <select id="yearSelector" name="year" class="form-control sa-year-selector">
                             <% availableYears.forEach(function(year) { %>
                                 <option value="<%= year %>" <%= year === selectedYear ? 'selected' : '' %>>
                                     <%= year %><%= year === currentYear ? ' (' + TranslationService.t('current-year') + ')' : '' %>
@@ -34,7 +45,7 @@
             </div>
             <div class="panel-body">
                 <% if (canManageSupportAgreements) { %>
-                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/year" class="form-horizontal" style="margin-bottom: 20px;">
+                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/year" class="form-horizontal sa-space-20">
                         <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
                         <input type="hidden" name="year" value="<%= selectedYear %>">
                         <div class="form-group">
@@ -58,7 +69,7 @@
                         </div>
                     </form>
 
-                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/year/delete" class="text-right" style="margin-bottom: 20px;">
+                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/year/delete" class="text-right sa-space-20">
                         <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
                         <input type="hidden" name="year" value="<%= selectedYear %>">
                         <button type="submit" class="btn btn-danger">Delete support year</button>
@@ -91,8 +102,8 @@
                 <%
                     var remainingDays = Math.max(0, agreedSupportDays - usedSupportDays);
                     var percentage = agreedSupportDays > 0 ? (remainingDays / agreedSupportDays) * 100 : 0;
-                    var progressClass = percentage > 50 ? 'progress-bar-success' :
-                        percentage > 20 ? 'progress-bar-warning' : 'progress-bar-danger';
+                    var progressClass = percentage > 50 ? 'sa-progress-success' :
+                        percentage > 20 ? 'sa-progress-warning' : 'sa-progress-danger';
                 %>
                 <div class="row">
                     <div class="col-md-12">
@@ -105,12 +116,12 @@
                                 <%= TranslationService.t('no-agreement-configured') %>
                             <% } %>
                         </p>
-                        <div class="progress">
-                            <div class="progress-bar <%= progressClass %>" role="progressbar"
-                                aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100"
-                                style="width: <%= percentage.toFixed(1) %>%">
+                        <div class="sa-progress">
+                            <progress class="sa-progress-meter <%= progressClass %>" max="100" value="<%= percentage %>"
+                                aria-label="<%= TranslationService.t('remaining-support-days') %>">
                                 <%= Math.round(percentage) %>% available
-                            </div>
+                            </progress>
+                            <span class="sa-progress-label" aria-hidden="true"><%= Math.round(percentage) %>% available</span>
                         </div>
                     </div>
                 </div>
@@ -132,7 +143,7 @@
             </div>
             <div class="panel-body">
                 <% if (canManageSupportAgreements) { %>
-                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note" class="form-horizontal" style="margin-bottom: 30px;">
+                    <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note" class="form-horizontal sa-space-30">
                         <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
                         <input type="hidden" name="year" value="<%= selectedYear %>">
                         <div class="form-group">
@@ -146,7 +157,7 @@
                             <div class="col-sm-4">
                                 <input id="newReleaseNoteDate" name="releaseDate" type="date" class="form-control">
                             </div>
-                            <div class="col-sm-6 checkbox" style="padding-top: 0;">
+                            <div class="col-sm-6 checkbox sa-checkbox">
                                 <label>
                                     <input name="published" type="checkbox" value="true"> Published
                                 </label>
@@ -189,7 +200,7 @@
                                         <div class="col-sm-4">
                                             <input name="releaseDate" type="date" class="form-control" value="<%= note.releaseDate || '' %>">
                                         </div>
-                                        <div class="col-sm-6 checkbox" style="padding-top: 0;">
+                                        <div class="col-sm-6 checkbox sa-checkbox">
                                             <label>
                                                 <input name="published" type="checkbox" value="true" <%= note.published ? 'checked' : '' %>> Published
                                             </label>
@@ -207,7 +218,7 @@
                                         </div>
                                     </div>
                                 </form>
-                                <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note/delete" class="text-right" style="margin-top: 10px;">
+                                <form method="POST" action="/<%= branding %>/<%= portal %>/admin/supportAgreement/release-note/delete" class="text-right sa-space-top-10">
                                     <input type="hidden" name="_csrf" value="<%= typeof _csrf !== 'undefined' ? _csrf : '' %>">
                                     <input type="hidden" name="year" value="<%= selectedYear %>">
                                     <input type="hidden" name="id" value="<%= note.id %>">
@@ -218,7 +229,7 @@
                                 <% if (note.releaseDate) { %>
                                     <p class="text-muted"><%= note.releaseDate %></p>
                                 <% } %>
-                                <p><%- note.renderedBody %></p>
+                                <div class="sa-release-note"><%- note.renderedBody %></div>
                             <% } %>
                         </div>
                     <% }); %>
@@ -226,4 +237,9 @@
             </div>
         </div>
     </div>
+<% if (typeof hasSharedAdminShell !== 'undefined' && hasSharedAdminShell) { %>
+    <%- include('layout/end.ejs') %>
+<% } else { %>
 </div>
+<% } %>
+<script src="<%= BrandingService.getRootContext() %>/js/support-agreements/admin.js"<% if (typeof contentSecurityPolicyNonce !== 'undefined' && contentSecurityPolicyNonce) { %> nonce="<%= contentSecurityPolicyNonce %>"<% } %>></script>

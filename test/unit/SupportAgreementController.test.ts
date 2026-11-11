@@ -10,6 +10,7 @@ type SinonStub = ReturnType<typeof sinon.stub>;
 describe('SupportAgreementController', () => {
   let controller: InstanceType<typeof Controllers.SupportAgreement>;
   let sendViewStub: SinonStub;
+  let resolveViewStub: SinonStub;
   let redirectStub: SinonStub;
   let getBrandFromReqStub: SinonStub;
   let getManagementViewModelStub: SinonStub;
@@ -18,6 +19,7 @@ describe('SupportAgreementController', () => {
     installSupportAgreementTestGlobals();
     controller = new Controllers.SupportAgreement();
     sendViewStub = sinon.stub(controller, 'sendView');
+    resolveViewStub = sinon.stub(controller, '_getResolvedView').returns(null);
     redirectStub = sinon.stub();
     getBrandFromReqStub = BrandingService.getBrandFromReq as SinonStub;
     getManagementViewModelStub = ((globalThis as unknown as Record<string, { getManagementViewModel: SinonStub }>).supportagreementservice).getManagementViewModel;
@@ -129,6 +131,31 @@ describe('SupportAgreementController', () => {
     const locals = sendViewStub.firstCall.args[3];
     expect(locals.canManageSupportAgreements).to.equal(false);
   });
+
+  it('uses the shared shell when all its partials resolve for the request brand and portal', async () => {
+    resolveViewStub.callsFake((_branding: string, _portal: string, view: string) => `default/default/${view}`);
+    getManagementViewModelStub.resolves({ releaseNotes: [] });
+
+    await controller.index(createReq(), createRes());
+
+    expect(sendViewStub.firstCall.args[3].hasSharedAdminShell).to.equal(true);
+    for (const partial of ['start', 'end', 'page-header']) {
+      expect(resolveViewStub.calledWithExactly('default', 'portal', `admin/layout/${partial}`)).to.equal(true);
+    }
+  });
+
+  for (const missing of ['start', 'end', 'page-header']) {
+    it(`uses the legacy layout when the ${missing} partial is absent`, async () => {
+      resolveViewStub.callsFake((_branding: string, _portal: string, view: string) =>
+        view === `admin/layout/${missing}` ? null : `default/default/${view}`
+      );
+      getManagementViewModelStub.resolves({ releaseNotes: [] });
+
+      await controller.index(createReq(), createRes());
+
+      expect(sendViewStub.firstCall.args[3].hasSharedAdminShell).to.equal(false);
+    });
+  }
 
   it('saveYear calls the service and redirects back to the selected year', async () => {
     const brand = { id: 'brand-1', name: 'default' };

@@ -72,7 +72,16 @@ export namespace Controllers {
       const brand = this.getBrand(req);
       const viewModel = await supportagreementservice.getManagementViewModel(brand, resolvedSelectedYear);
 
+      const branding = String(req.param('branding'));
+      const portal = String(req.param('portal'));
+      // Use the same branding/hook/core lookup as sendView. Older cores only
+      // provide the sidebar, so never include shared-shell partials blindly.
+      const hasSharedAdminShell = ['start', 'end', 'page-header'].every(partial =>
+        this._getResolvedView(branding, portal, `admin/layout/${partial}`) !== null
+      );
+
       this.sendView(req, res, 'admin/supportAgreement', {
+        hasSharedAdminShell,
         branding: req.param('branding'),
         portal: req.param('portal'),
         agreedSupportDays: viewModel.agreedSupportDays,
